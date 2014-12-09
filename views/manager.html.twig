@@ -1,0 +1,183 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-xs-4 col-md-4">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalAddTask">
+                Ajouter
+            </button>
+        </div>
+        <div class="col-xs-4 col-md-4 text-right">
+            <form action="{{ path('manager') }}" method="get">
+                <select class="form-control" name="c" onchange="this.form.submit();">
+                    <option selected disabled>Filtrer par catégories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <div class="col-xs-4 col-md-4 text-right">
+            <form action="{{ path('manager') }}" method="get" class="form-search">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <input class="btn btn-default" type="submit" value="Rechercher">
+                        </div>
+                        <input type="text" name="q" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Modal #}
+    <div class="modal fade" id="modalAddTask" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Fermer</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Ajouter une tâche</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ path('manager') }}" method="post" id="formAddTask">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder="Description de la tâche" class="name form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="created" placeholder="Date de rappel" class="date form-control">
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button id="dLabel" class="dropdown-toggle btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">&darr;</button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        {% for category in categories %}
+                                            <li><a href="#" data-name="{{ category.name }}">{{ category.name }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <input type="text" name="category" placeholder="Catégorie" class="category form-control">
+                            </div>
+                        </div>
+                        <div class="form-group text-center">
+                            <button id="addTask" class="btn btn-default">Ajouter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# End Modal #}
+
+    <form action="{{ path('deleteTask') }}" method="post">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="js-select-all"></th>
+                    <th>Tâche</th>
+                    <th>Catégorie</th>
+                    <th><a href="#" id="order" data-order="DESC">Date &darr;</a></th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    {% if date(task.created) <= date() and task.status != 1 %}
+                        <tr data-id="{{ task.id }}" class="dataTask-{{ task.id }} red">
+                    {% else %}
+                        <tr data-id="{{ task.id }}" class="dataTask-{{ task.id }}">
+                    {% endif %}
+                        <td><input type="checkbox" name="ids[]" value="{{ task.id }}" class="js-select"></td>
+                        <td>{% if task.status == 1 %}<s>{{ task.name }}</s>{% else %}{{ task.name }}{% endif %}</td>
+                        <td>{{ task.categories.name }}</td>
+                        <td>{{ task.created|date('d/m') }}</td>
+                        <td>
+                            {% if task.status == 1 %}
+                                <i class="fa fa-check"></i>
+                            {% else %}
+                                <a href="{{ path('validateTask', {'id': task.id}) }}" data-id="{{ task.id }}" class="validate"><i class="fa fa-check"></i></a>
+                            {% endif %}
+                            <a href="{{ path('deleteTask', {'id': task.id}) }}" data-id="{{ task.id }}" class="remove"><i class="fa fa-close"></i></a>
+                        </td>
+                    </tr>
+                    <tr class="formUpdateTask formUpdateTask-{{ task.id }}">
+                        <td class="align-m"><input type="checkbox" name="ids[]" value="{{ task.id }}" class="js-select"></td>
+                        <td><input type="text" class="form-control" name="name" value="{{ task.name }}"></td>
+                        <td style="width: 30%;">
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button id="dLabel-{{ task.id }}" class="dropdown-toggle btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">&darr;</button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel-{{ task.id }}">
+                                        {% for category in categories %}
+                                            <li><a href="#" data-id="formUpdateTask-{{ task.id }}" data-name="{{ category.name }}">{{ category.name }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <input type="text" name="category" value="{{ task.categories.name }}" class="category form-control">
+                            </div>
+                        </td>
+                        <td><input type="text" class="form-control" name="created" value="{{ task.created|date('d/m') }}"></td>
+                        <td class="align-m">
+                            <a href="#" data-id="{{ task.id }}" class="updateTask"><i class="fa fa-save"></i></a>
+                            {% if task.status == 1 %}
+                                <i class="fa fa-check"></i>
+                            {% else %}
+                                <a href="{{ path('validateTask', {'id': task.id}) }}" data-id="{{ task.id }}" class="validate"><i class="fa fa-check"></i></a>
+                            {% endif %}
+                            <a href="{{ path('deleteTask', {'id': task.id}) }}" data-id="{{ task.id }}" class="remove"><i class="fa fa-close"></i></a>
+                        </td>
+                    </tr>
+                    <tr></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-xs-4 col-md-4">
+                <button type="submit" class="removes btn btn-default">Supprimer la séléction</button>
+            </div>
+            <div class="col-xs-8 col-md-8 text-right">
+                {# Pagination #}
+                {%  set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) %}
+                {% if app.request.get('c') %}
+                    {% set url = path ~ '?c=' ~ app.request.get('c') ~ '&' %}
+                {% elseif app.request.get('q') %}
+                    {% set url = path ~ '?q=' ~ app.request.get('q') ~ '&' %}
+                {% else %}
+                    {% set url = path ~ '?' %}
+                {% endif %}
+                <ul class="pagination">
+                    <li><a href="{{ url }}p={{ tasks.getPreviousPage }}"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
+                    {% for page in tasks.getLinks(3) %}
+                        <li><a href="{{ url }}p={{ page }}">{{ page }}</a></li>
+                    {% endfor %}
+                    <li><a href="{{ url }}p={{ tasks.getNextPage }}"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+
+{% block javascripts %}
+    <script type="text/javascript">
+    $(document).ready(function() {
+        /**
+         * Dropdown init
+         **/
+        $('.dropdown-toggle').dropdown();
+        
+        /**
+         * Autocomplete field category
+         **/
+        var list = {{ list|json_encode|raw }};
+        $('.modal-body .category').autocomplete({
+            source: list
+        });
+        $('.table .category').autocomplete({
+            source: list
+        });
+    });
+    </script>
+{% endblock %}

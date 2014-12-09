@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Todo List Manager</title>
+    <link rel="stylesheet" type="text/css" href="web/stylesheets/jquery-ui.min.css"/>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="web/stylesheets/styles.css">
+	<!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+	<div class="container">
+        <hr/>
+        <h1>Gestionnaire de tâches</h1>
+        <div class="row">
+            <div class="col-xs-6 col-md-6">
+                <p>Inscrit toi, créee t'es différentes tâches et administre les !</p>
+            </div>
+            <div class="col-xs-6 col-md-6 text-right">
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <p>Vous êtes connecté en tant que <strong>{{ currentUser.username }}</strong> ! - <a href="{{ path('logout') }}">Déconnexion</a></p>
+                {% endif %}
+            </div>
+        </div>
+        <hr/>
+        {% set alertTypeAvaillable = [ 'info', 'success', 'warning', 'danger'] %}
+        {% if app.session.flashBag is defined %}
+            {%- for alertType in alertTypeAvaillable %}
+                {%- for alert in app.session.flashBag.get(alertType) %}
+                    {% if alert is defined %}
+                        <div class="alert alert-{{ alertType }}" >
+                            <button class="close" data-dismiss="alert">×</button>
+                            {{ alert }}
+                        </div>
+                    {% endif %}
+                {%- endfor %}
+            {%- endfor %}
+        {% endif %}
+
+		{% block body %}{% endblock %}
+	</div>
+
+	<script type="text/javascript" src="web/javascripts/jquery.min.js"></script>
+    <script type="text/javascript" src="web/javascripts/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="web/javascripts/bootstrap.js"></script>
+    <script type="text/javascript" src="web/javascripts/main.js"></script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

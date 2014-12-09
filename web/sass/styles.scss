@@ -1,0 +1,19 @@
+@import "bootstrap-compass";
+@import "bootstrap-variables";
+@import "bootstrap";
+
+.pagination {
+	margin: 0;
+}
+.red {
+  color: $state-danger-text;
+}
+.formUpdateTask {
+  display: none;
+}
+.ui-widget-content {
+	z-index: 9999999;
+}
+.align-m {
+	vertical-align: middle !important;
+}

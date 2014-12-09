@@ -1,0 +1,31 @@
+﻿## File tmp
+*~
+.DS_Store
+thumbs.db
+
+## Ide
+.buildpath
+.project
+.settings/
+.idea
+
+## Node && Bower
+node_modules
+bower_components
+
+## Vendors, Cache, Medias
+vendor/
+cache/
+web/.sass-cache/
+#uploads/
+
+## Models
+app/model/sql/*
+app/model/map/*
+app/model/om/*
+
+## Config
+app/config/propel/*-conf.php
+
+## Composer
+composer.phar

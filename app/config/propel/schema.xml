@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="todo" namespace="app\model" tablePrefix="silex_" defaultIdMethod="native"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd">
+
+    <table name="users" phpName="Users" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="username" phpName="Username" type="VARCHAR" size="50" required="true"/>
+        <column name="password" phpName="Password" type="VARCHAR" size="255" required="true"/>
+        <column name="email" phpName="Email" type="VARCHAR" size="255" required="true"/>
+        <column name="roles" phpName="Roles" type="VARCHAR" default="ROLE_USER"/>
+
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+
+    <table name="tasks" phpName="Tasks" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="255" required="true"/>
+        <column name="status" phpName="Status" type="BOOLEAN" default="false"/>
+        <column name="created" phpName="Created" type="DATE"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" required="true"/>
+        <column name="category_id" phpName="CategoryId" type="INTEGER" default="0"/>
+
+        <foreign-key foreignTable="users" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="categories" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="category_id" foreign="id"/>
+        </foreign-key>
+        <index name="user_id">
+            <index-column name="user_id"/>
+        </index>
+        <index name="category_id">
+            <index-column name="category_id"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+
+    <table name="categories" phpName="Categories" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="255" required="true" />
+        <column name="user_id" phpName="UserId" type="INTEGER" required="true"/>
+        
+        <foreign-key foreignTable="users" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+        
+        <index name="user_id">
+            <index-column name="user_id"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+
+</database>
